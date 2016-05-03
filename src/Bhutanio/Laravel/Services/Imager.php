@@ -2,7 +2,7 @@
 
 namespace Bhutanio\Laravel\Services;
 
-use Image;
+use Intervention\Image\Facades\Image;
 
 /**
  * Class Imager.

@@ -6,7 +6,7 @@
  */
 function meta()
 {
-    return app('metadata');
+    return app(Bhutanio\Laravel\Services\MetaDataService::class);
 }
 
 /**
@@ -16,7 +16,7 @@ function meta()
  */
 function guzzler($config = [])
 {
-    return app('guzzler', $config);
+    return app(Bhutanio\Laravel\Services\Guzzler::class, $config);
 }
 
 /**

@@ -3,7 +3,7 @@
 namespace Bhutanio\Laravel\Services;
 
 use Bhutanio\Laravel\Contracts\Services\HttpClientInterface;
-use Cache;
+use Illuminate\Support\Facades\Cache;
 use GuzzleHttp\Client as GuzzleClient;
 
 class Guzzler implements HttpClientInterface
