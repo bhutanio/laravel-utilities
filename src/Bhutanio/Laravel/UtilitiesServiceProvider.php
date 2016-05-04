@@ -6,7 +6,7 @@ use Bhutanio\Laravel\Services\Guzzler;
 use Bhutanio\Laravel\Services\MetaDataService;
 use Illuminate\Support\ServiceProvider;
 
-class AbitServiceProvider extends ServiceProvider
+class UtilitiesServiceProvider extends ServiceProvider
 {
     /**
      * Bootstrap any application services.

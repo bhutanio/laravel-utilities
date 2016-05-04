@@ -51,7 +51,7 @@ class DataService implements DataServiceInterface
     /**
      * Update data.
      *
-     * @param int   $id   primary key
+     * @param int $id primary key
      * @param array $data
      *
      * @return Model|bool
@@ -80,6 +80,12 @@ class DataService implements DataServiceInterface
         return $this->model->where('id', $id)->delete();
     }
 
+    /**
+     * @param $model
+     * @param $data
+     *
+     * @return array
+     */
     public function fillableData($model, $data)
     {
         $fill_data = [];

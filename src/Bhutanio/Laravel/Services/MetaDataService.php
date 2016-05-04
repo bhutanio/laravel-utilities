@@ -2,14 +2,16 @@
 
 namespace Bhutanio\Laravel\Services;
 
+use Illuminate\Http\Request;
+
 class MetaDataService
 {
     protected $meta_title, $page_title, $description, $canonical, $icon, $theme, $color;
 
-    public function __construct()
+    public function __construct(Request $request)
     {
-        $this->meta_title = env('SITE_NAME');
-        $this->setDefaultMeta();
+        $this->meta_title = $this->getDefaultTitle();
+        $this->setDefaultMeta($request);
     }
 
     public function setMeta($page_title = null, $meta_title = null, $description = null, $icon = null)
@@ -17,7 +19,7 @@ class MetaDataService
         $this->pageTitle($page_title);
         $this->metaTitle($meta_title);
         if (empty($meta_title)) {
-            $this->metaTitle($page_title.' - '.env('SITE_NAME'));
+            $this->metaTitle($page_title . ' - ' . $this->meta_title);
         }
         $this->description($description);
         $this->icon($icon);
@@ -72,9 +74,12 @@ class MetaDataService
         return $this->icon;
     }
 
-    private function setDefaultMeta()
+    /**
+     * @param Request $request
+     */
+    private function setDefaultMeta(Request $request)
     {
-        switch (request()->getRequestUri()) {
+        switch ($request->getRequestUri()) {
             case '/auth/login':
                 $this->setMeta('Login');
                 break;
@@ -82,5 +87,13 @@ class MetaDataService
                 $this->setMeta('Register');
                 break;
         }
+    }
+
+    /**
+     * @return mixed
+     */
+    private function getDefaultTitle()
+    {
+        return env('SITE_NAME') ?: 'Site Name';
     }
 }

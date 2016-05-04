@@ -40,7 +40,7 @@ class Emailer implements EmailerInterface
      * @param string $to
      * @param string $subject
      * @param string $view
-     * @param array  $data
+     * @param array $data
      *
      * @return self
      */
@@ -48,8 +48,8 @@ class Emailer implements EmailerInterface
     {
         $this->to = $to;
         $this->subject = $subject;
-        $this->view_html = $view.'-html';
-        $this->view_plain = $view.'-plain';
+        $this->view_html = $view . '-html';
+        $this->view_plain = $view . '-plain';
 
         $this->data = array_merge(
             [
