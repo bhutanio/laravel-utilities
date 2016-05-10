@@ -3,8 +3,8 @@
 namespace Bhutanio\Laravel\Services;
 
 use Bhutanio\Laravel\Contracts\Services\HttpClientInterface;
-use Illuminate\Support\Facades\Cache;
 use GuzzleHttp\Client as GuzzleClient;
+use Illuminate\Support\Facades\Cache;
 
 class Guzzler implements HttpClientInterface
 {
@@ -13,32 +13,41 @@ class Guzzler implements HttpClientInterface
      */
     protected $response;
 
+    /**
+    * @var int
+    */
     protected $status_code;
 
     /**
      * @var string
      */
     protected $url;
+
     /**
      * @var array
      */
     protected $header;
+
     /**
      * @var string
      */
     protected $body;
+
     /**
      * @var bool|int
      */
     protected $cached = false;
+
     /**
      * @var string
      */
     protected $cache_id;
+
     /**
      * @var string
      */
     protected $cache_prefix = 'guzzler:';
+
     /**
      * @var array
      */
@@ -115,7 +124,7 @@ class Guzzler implements HttpClientInterface
     {
         $this->cached = $duration;
         if ($cache_id) {
-            $this->cache_id = $this->cache_prefix.$cache_id;
+            $this->cache_id = $this->cache_prefix . $cache_id;
         }
 
         return $this;
@@ -125,24 +134,20 @@ class Guzzler implements HttpClientInterface
      * Perform a request.
      *
      * @param string $method
-     * @param array  $options
+     * @param array $options
      *
      * @return self
      */
     public function request($method, array $options = [])
     {
-        if ($method == 'GET' && $this->cached) {
-            $this->getCache();
+        if ($method == 'GET' && $this->getCache()) {
+            return $this;
         }
 
-        if (!empty($this->query)) {
-            $options = $this->mergeOptions($options);
-        }
-
-        $this->response = $this->client->request($method, $this->url, $options);
+        $this->response = $this->client->request($method, $this->url, $this->mergeOptions($options));
         $this->status_code = $this->response->getStatusCode();
         $this->header = $this->response->getHeaders();
-        $this->body = (string) $this->response->getBody();
+        $this->body = (string)$this->response->getBody();
 
         if ($method == 'GET' && $this->cached) {
             $this->putCache();
@@ -182,7 +187,7 @@ class Guzzler implements HttpClientInterface
      */
     public function toArray()
     {
-        if ($this->body && $this->is_json($this->body)) {
+        if ($this->body && $this->isJson($this->body)) {
             return json_decode($this->body, true);
         }
 
@@ -198,7 +203,7 @@ class Guzzler implements HttpClientInterface
      */
     public function toJson($options = 0)
     {
-        if ($this->body && $this->is_json($this->body)) {
+        if ($this->body && $this->isJson($this->body)) {
             return json_encode(json_decode($this->body));
         }
 
@@ -310,11 +315,11 @@ class Guzzler implements HttpClientInterface
             $this->getCacheId();
 
             $data = [
-                'url' => $this->url,
-                'query' => $this->query,
+                'url'         => $this->url,
+                'query'       => $this->query,
                 'status_code' => $this->status_code,
-                'header' => $this->header,
-                'body' => $this->body,
+                'header'      => $this->header,
+                'body'        => $this->body,
             ];
             Cache::put($this->cache_id, $data, $this->cached);
         }
@@ -331,11 +336,15 @@ class Guzzler implements HttpClientInterface
                 $this->query = $data['query'];
                 $this->header = $data['header'];
                 $this->body = $data['body'];
+
+                return true;
             }
         }
+
+        return false;
     }
 
-    private function is_json($string)
+    private function isJson($string)
     {
         json_decode($string);
 
@@ -344,19 +353,23 @@ class Guzzler implements HttpClientInterface
 
     private function mergeOptions($options)
     {
-        if (!empty($this->query['multipart']) && !empty($this->query['form_params'])) {
-            $form_params = $this->query['form_params'];
-            foreach ($form_params as $key => $value) {
-                $form_param = [
-                    'name' => $key,
-                    'contents' => $value,
-                ];
-                array_push($this->query['multipart'], $form_param);
+        if (!empty($this->query)) {
+            if (!empty($this->query['multipart']) && !empty($this->query['form_params'])) {
+                $form_params = $this->query['form_params'];
+                foreach ($form_params as $key => $value) {
+                    $form_param = [
+                        'name'     => $key,
+                        'contents' => $value,
+                    ];
+                    array_push($this->query['multipart'], $form_param);
+                }
+                unset($this->query['form_params']);
             }
-            unset($this->query['form_params']);
+
+            return array_merge_recursive($options, $this->query);
         }
 
-        return array_merge_recursive($options, $this->query);
+        return $options;
     }
 
     private function getCacheId()
@@ -364,9 +377,9 @@ class Guzzler implements HttpClientInterface
         if (empty($this->cache_id)) {
             $query_string = '';
             if (!empty($this->query['query'])) {
-                $query_string = '?'.http_build_query($this->query['query']);
+                $query_string = '?' . http_build_query($this->query['query']);
             }
-            $this->cache_id = $this->cache_prefix.md5($this->url.$query_string);
+            $this->cache_id = $this->cache_prefix . md5($this->url . $query_string);
         }
     }
 }
