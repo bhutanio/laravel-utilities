@@ -6,12 +6,18 @@ use Illuminate\Http\Request;
 
 class MetaDataService
 {
-    protected $meta_title, $page_title, $description, $canonical, $icon, $theme, $color;
+    protected $meta_title, $page_title, $description, $canonical, $icon, $theme, $color, $request;
 
+    /**
+     * MetaDataService constructor.
+     * @param Request $request
+     */
     public function __construct(Request $request)
     {
+        $this->request = $request;
+
         $this->meta_title = $this->getDefaultTitle();
-        $this->setDefaultMeta($request);
+        $this->setDefaultMeta();
     }
 
     public function setMeta($page_title = null, $meta_title = null, $description = null, $icon = null)
@@ -19,6 +25,12 @@ class MetaDataService
         $this->pageTitle($page_title);
         $this->metaTitle($meta_title);
         if (empty($meta_title)) {
+            if ($page = $this->request->get('page')) {
+                if ($page > 1) {
+                    $page_title .=  ' (Page ' . $page . ')';
+                }
+            }
+
             $this->metaTitle($page_title . ' - ' . $this->meta_title);
         }
         $this->description($description);
@@ -74,12 +86,9 @@ class MetaDataService
         return $this->icon;
     }
 
-    /**
-     * @param Request $request
-     */
-    private function setDefaultMeta(Request $request)
+    private function setDefaultMeta()
     {
-        switch ($request->getRequestUri()) {
+        switch ($this->request->getRequestUri()) {
             case '/auth/login':
                 $this->setMeta('Login');
                 break;
