@@ -90,7 +90,7 @@ class DataService implements DataServiceInterface
     {
         $fill_data = [];
         foreach ($model->getFillable() as $fill) {
-            if (isset($data[$fill])) {
+            if (array_key_exists($fill, $data)) {
                 $fill_data[$fill] = !empty($data[$fill]) ? $data[$fill] : null;
             }
         }
