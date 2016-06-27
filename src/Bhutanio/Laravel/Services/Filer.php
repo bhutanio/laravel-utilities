@@ -120,6 +120,7 @@ class Filer implements FilerInterface
     public function put($file, $contents)
     {
         $saved = $this->storage->put($this->file_path . $file, $contents);
+
         if ($saved) {
             $this->sync($file);
         }
@@ -135,7 +136,7 @@ class Filer implements FilerInterface
      */
     public function copy($source, $destination)
     {
-        $this->storage->copy($source, $this->file_path .$destination);
+        $this->storage->copy($source, $this->file_path . $destination);
         $this->sync($destination);
     }
 
@@ -147,7 +148,7 @@ class Filer implements FilerInterface
      */
     public function move($source, $destination)
     {
-        $this->storage->move($source, $this->file_path .$destination);
+        $this->storage->move($source, $this->file_path . $destination);
         $this->sync($destination);
     }
 
