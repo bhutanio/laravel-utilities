@@ -48,6 +48,22 @@ interface FilerInterface
     public function put($file, $contents);
 
     /**
+     * @param $source
+     * @param $destination
+     *
+     * @return bool
+     */
+    public function copy($source, $destination);
+
+    /**
+     * @param $source
+     * @param $destination
+     *
+     * @return bool
+     */
+    public function move($source, $destination);
+
+    /**
      * @param $file
      *
      * @return mixed

@@ -128,6 +128,30 @@ class Filer implements FilerInterface
     }
 
     /**
+     * @param $source
+     * @param $destination
+     *
+     * @return bool
+     */
+    public function copy($source, $destination)
+    {
+        $this->storage->copy($source, $this->file_path .$destination);
+        $this->sync($destination);
+    }
+
+    /**
+     * @param $source
+     * @param $destination
+     *
+     * @return bool
+     */
+    public function move($source, $destination)
+    {
+        $this->storage->move($source, $this->file_path .$destination);
+        $this->sync($destination);
+    }
+
+    /**
      * @param $file
      *
      * @return bool
