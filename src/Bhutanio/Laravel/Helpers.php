@@ -41,10 +41,10 @@ function leveled_dir($text)
 {
     $dirs = str_split($text, 1);
     if (count($dirs) > 2) {
-        return $dirs[0].DIRECTORY_SEPARATOR.$dirs[1].DIRECTORY_SEPARATOR.$dirs[2];
+        return $dirs[0] . DIRECTORY_SEPARATOR . $dirs[1] . DIRECTORY_SEPARATOR . $dirs[2];
     }
 
-    return '0'.DIRECTORY_SEPARATOR.'0'.DIRECTORY_SEPARATOR.'0';
+    return '0' . DIRECTORY_SEPARATOR . '0' . DIRECTORY_SEPARATOR . '0';
 }
 
 /**
@@ -64,7 +64,7 @@ function get_ip()
 /**
  * Validate IP Address.
  *
- * @param string $ip    IP address
+ * @param string $ip IP address
  * @param string $which IP protocol: 'ipv4' or 'ipv6'
  *
  * @return bool
@@ -86,7 +86,12 @@ function is_valid_ip($ip, $which = 'ipv4')
             break;
     }
 
-    return (bool) filter_var($ip, FILTER_VALIDATE_IP, $which);
+    return (bool)filter_var($ip, FILTER_VALIDATE_IP, $which);
+}
+
+function is_valid_ipv6($ip)
+{
+    return is_valid_ip($ip, 'ipv6');
 }
 
 /**
@@ -102,7 +107,7 @@ function is_public_ip($ip)
         return false;
     }
 
-    return (bool) filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE);
+    return (bool)filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE);
 }
 
 // View Helpers
@@ -116,7 +121,7 @@ function is_public_ip($ip)
 function form_errors($errors, $key)
 {
     if ($errors->has($key)) {
-        return '<span class="help-block form-error">'.$errors->first($key).'</span>';
+        return '<span class="help-block form-error">' . $errors->first($key) . '</span>';
     }
 
     return '';
