@@ -54,7 +54,7 @@ interface HttpClientInterface extends Arrayable, Jsonable
      * Perform a request.
      *
      * @param string $method
-     * @param array  $options
+     * @param array $options
      *
      * @return self
      */

@@ -53,9 +53,9 @@ interface GatekeeperInterface
     /**
      * Check if user can perform action on a given route.
      *
-     * @param string           $action
+     * @param string $action
      * @param \App\Models\User $user
-     * @param string           $route
+     * @param string $route
      *
      * @return bool
      */
@@ -64,8 +64,8 @@ interface GatekeeperInterface
     /**
      * Check if user can perform action on a given model.
      *
-     * @param string                              $action
-     * @param \App\Models\User                    $user
+     * @param string $action
+     * @param \App\Models\User $user
      * @param \Illuminate\Database\Eloquent\Model $model
      *
      * @return bool

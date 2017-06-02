@@ -27,7 +27,7 @@ interface RepositoryInterface
      *
      * @param string $column
      * @param string $operator
-     * @param mixed  $value
+     * @param mixed $value
      * @param string $boolean
      *
      * @return $this
@@ -56,7 +56,7 @@ interface RepositoryInterface
      * Get first record by column and value.
      *
      * @param string $column
-     * @param mixed  $value
+     * @param mixed $value
      *
      * @return \Illuminate\Database\Eloquent\Model
      */
@@ -82,7 +82,7 @@ interface RepositoryInterface
      * Perform advanced search on the database.
      *
      * @param array $param
-     * @param int   $per_page
+     * @param int $per_page
      *
      * @return array [param, title, results]
      */

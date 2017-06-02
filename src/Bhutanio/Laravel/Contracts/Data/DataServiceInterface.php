@@ -25,7 +25,7 @@ interface DataServiceInterface
     /**
      * Update data.
      *
-     * @param int   $id   primary key
+     * @param int $id primary key
      * @param array $data
      *
      * @return \Illuminate\Database\Eloquent\Model|bool

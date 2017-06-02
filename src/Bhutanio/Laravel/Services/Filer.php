@@ -195,14 +195,16 @@ class Filer implements FilerInterface
                 if ($this->storage_cloud->exists($this->file_path . $file)) {
                     return true;
                 } else {
-                    return $this->storage_cloud->put($this->file_path . $file, $this->storage_local->get($this->file_path . $file));
+                    return $this->storage_cloud->put($this->file_path . $file,
+                        $this->storage_local->get($this->file_path . $file));
                 }
             }
             if ($this->storage_cloud->exists($this->file_path . $file)) {
                 if ($this->storage_local->exists($this->file_path . $file)) {
                     return true;
                 } else {
-                    return $this->storage_local->put($this->file_path . $file, $this->storage_cloud->get($this->file_path . $file));
+                    return $this->storage_local->put($this->file_path . $file,
+                        $this->storage_cloud->get($this->file_path . $file));
                 }
             }
         }

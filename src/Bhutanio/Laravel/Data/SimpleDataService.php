@@ -65,6 +65,6 @@ class SimpleDataService
             return call_user_func_array([$this->repo, $method], $parameters);
         }
 
-        throw new \Exception('Method "'.$method.'" not found on class "'.class_basename($this->data).'" or "'.class_basename($this->repo).'"');
+        throw new \Exception('Method "' . $method . '" not found on class "' . class_basename($this->data) . '" or "' . class_basename($this->repo) . '"');
     }
 }

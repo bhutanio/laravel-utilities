@@ -27,7 +27,7 @@ class MetaDataService
         if (empty($meta_title)) {
             if ($page = $this->request->get('page')) {
                 if ($page > 1) {
-                    $page_title .=  ' (Page ' . $page . ')';
+                    $page_title .= ' (Page ' . $page . ')';
                 }
             }
 

@@ -14,8 +14,8 @@ class Guzzler implements HttpClientInterface
     protected $response;
 
     /**
-    * @var int
-    */
+     * @var int
+     */
     protected $status_code;
 
     /**

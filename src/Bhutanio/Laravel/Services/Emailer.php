@@ -53,7 +53,7 @@ class Emailer implements EmailerInterface
 
         $this->data = array_merge(
             [
-                'to' => $to,
+                'to'      => $to,
                 'subject' => $subject,
             ],
             $data

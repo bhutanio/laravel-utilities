@@ -42,12 +42,12 @@ class Imager extends Filer
     public function getInfo()
     {
         return [
-            'mime' => $this->image->mime(),
-            'width' => $this->image->width(),
-            'height' => $this->image->height(),
+            'mime'      => $this->image->mime(),
+            'width'     => $this->image->width(),
+            'height'    => $this->image->height(),
             'extension' => $this->image->extension,
-            'filename' => $this->image->filename,
-            'filesize' => $this->image->filesize(),
+            'filename'  => $this->image->filename,
+            'filesize'  => $this->image->filesize(),
         ];
     }
 
@@ -74,7 +74,7 @@ class Imager extends Filer
 
     /**
      * @param $width
-     * @param null   $height
+     * @param null $height
      * @param string $position top-left|top|top-right|left|center|right|bottom-left|bottom|bottom-right
      *
      * @return $this

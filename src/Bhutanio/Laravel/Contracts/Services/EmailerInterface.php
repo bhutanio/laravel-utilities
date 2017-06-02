@@ -10,7 +10,7 @@ interface EmailerInterface
      * @param string $to
      * @param string $subject
      * @param string $view
-     * @param array  $data
+     * @param array $data
      *
      * @return self
      */

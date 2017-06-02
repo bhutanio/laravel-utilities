@@ -113,7 +113,7 @@ class DbRepository implements RepositoryInterface
      *
      * @param string $column
      * @param string $operator
-     * @param mixed  $value
+     * @param mixed $value
      * @param string $boolean
      *
      * @return $this
@@ -121,10 +121,10 @@ class DbRepository implements RepositoryInterface
     public function where($column, $operator = null, $value = null, $boolean = 'and')
     {
         array_push($this->conditions, [
-            'column' => $column,
+            'column'   => $column,
             'operator' => $operator,
-            'value' => $value,
-            'boolean' => $boolean,
+            'value'    => $value,
+            'boolean'  => $boolean,
         ]);
 
         return $this;
@@ -162,7 +162,7 @@ class DbRepository implements RepositoryInterface
      * Get first record by column and value.
      *
      * @param string $column
-     * @param mixed  $value
+     * @param mixed $value
      *
      * @return Model
      */
@@ -204,7 +204,7 @@ class DbRepository implements RepositoryInterface
      * Perform advanced search on the database.
      *
      * @param array $param
-     * @param int   $per_page
+     * @param int $per_page
      *
      * @return array [param, title, results]
      */
@@ -213,8 +213,8 @@ class DbRepository implements RepositoryInterface
         $this->per_page = $per_page;
 
         return [
-            'params' => $param,
-            'title' => '',
+            'params'  => $param,
+            'title'   => '',
             'results' => [],
         ];
     }
