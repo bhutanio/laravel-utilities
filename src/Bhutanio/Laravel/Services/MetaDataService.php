@@ -15,9 +15,7 @@ class MetaDataService
     public function __construct(Request $request)
     {
         $this->request = $request;
-
         $this->meta_title = $this->getDefaultTitle();
-        $this->setDefaultMeta();
     }
 
     public function setMeta($page_title = null, $meta_title = null, $description = null, $icon = null)
@@ -37,8 +35,13 @@ class MetaDataService
         $this->icon($icon);
     }
 
-    public function setTheme($theme = null, $color = null)
+    public function pageTitle($title = null)
     {
+        if ($title) {
+            $this->page_title = $title;
+        }
+
+        return $this->page_title;
     }
 
     public function metaTitle($title = null)
@@ -50,15 +53,6 @@ class MetaDataService
         return $this->meta_title;
     }
 
-    public function pageTitle($title = null)
-    {
-        if ($title) {
-            $this->page_title = $title;
-        }
-
-        return $this->page_title;
-    }
-
     public function description($description = null)
     {
         if ($description) {
@@ -66,15 +60,6 @@ class MetaDataService
         }
 
         return $this->description;
-    }
-
-    public function canonical($url = null)
-    {
-        if ($url) {
-            $this->canonical = $url;
-        }
-
-        return $this->canonical;
     }
 
     public function icon($icon = null)
@@ -86,21 +71,19 @@ class MetaDataService
         return $this->icon;
     }
 
-    private function setDefaultMeta()
+    public function setTheme($theme = null, $color = null)
     {
-        switch ($this->request->getRequestUri()) {
-            case '/auth/login':
-                $this->setMeta('Login');
-                break;
-            case '/auth/register':
-                $this->setMeta('Register');
-                break;
-        }
     }
 
-    /**
-     * @return mixed
-     */
+    public function canonical($url = null)
+    {
+        if ($url) {
+            $this->canonical = $url;
+        }
+
+        return $this->canonical;
+    }
+
     private function getDefaultTitle()
     {
         return env('SITE_NAME') ?: 'Site Name';
