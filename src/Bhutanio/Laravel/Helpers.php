@@ -113,15 +113,28 @@ function is_public_ip($ip)
 // View Helpers
 
 /**
- * @param $errors
- * @param $key
- *
+ * @param $errors \Illuminate\Support\ViewErrorBag
+ * @param $field string
  * @return string
  */
-function form_errors($errors, $key)
+function form_error_class($errors, $field)
 {
-    if ($errors->has($key)) {
-        return '<span class="help-block form-error">' . $errors->first($key) . '</span>';
+    if ($errors->has($field)) {
+        return ' has-error';
+    }
+
+    return '';
+}
+
+/**
+ * @param $errors \Illuminate\Support\ViewErrorBag
+ * @param $field string
+ * @return string
+ */
+function form_error($errors, $field)
+{
+    if ($errors->has($field)) {
+        return '<span class="help-block"><strong>' . $errors->first($field) . '</strong></span>';
     }
 
     return '';
