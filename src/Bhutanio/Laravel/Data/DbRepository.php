@@ -153,23 +153,24 @@ class DbRepository
      *
      * @param Model|Builder $query
      * @param array $child_ids
-     * @param string $parent
-     * @param string $parent_id
+     * @param string $foreign_key
      * @param string $child
      * @param string $child_id
      * @return Builder
      */
-    protected function searchChildren($query, $child_ids, $parent, $parent_id, $child, $child_id)
+    protected function searchChildren($query, $child_ids, $foreign_key, $child, $child_id)
     {
         $child_ids = (array)$child_ids;
         $child_ids = array_unique($child_ids);
+
+        $parent = $query->getTable();
 
         if (!empty($child_ids)) {
             foreach ($child_ids as $key => $value) {
                 $child_table = $child . '_' . $key;
 
                 $query = $query->join($child . ' as ' . $child_table, $parent . '.id', '=',
-                    $child_table . '.' . $parent_id)->where($child_table . '.' . $child_id, $value);
+                    $child_table . '.' . $foreign_key)->where($child_table . '.' . $child_id, $value);
             }
         }
 
