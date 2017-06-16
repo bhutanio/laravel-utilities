@@ -95,12 +95,16 @@ class DbRepository
     {
         list($search, $all, $filtered) = $this->fulltextClean($q);
 
+        if (mb_strlen($search) < 3) {
+            return $query->where($column, 'like', $this->formatSearchParameter($search));
+        }
+
         if (starts_with($search, ['"', "'"]) && ends_with($search, ['"', "'"])) {
-            return $query->whereRaw("MATCH($column) AGAINST(? IN BOOLEAN MODE)")->setBindings(["\"$keyword*\""]);
+            return $query->whereRaw("MATCH($column) AGAINST(? IN BOOLEAN MODE)")->setBindings(["\"$search*\""]);
         }
 
         return $query
-            ->whereRaw("MATCH($column) AGAINST(? IN BOOLEAN MODE)")->setBindings(["\"$keyword\""])
+            ->whereRaw("MATCH($column) AGAINST(? IN BOOLEAN MODE)")->setBindings(["\"$search\""])
             ->orWhere(function ($q) use ($all, $filtered, $column) {
                 $bindings = [];
                 $keywords = $filtered;
@@ -132,11 +136,7 @@ class DbRepository
 
         $filtered = $this->filterCommonKeywords($all);
 
-        return [
-            'search'   => $search,
-            'all'      => $all,
-            'filtered' => $filtered,
-        ];
+        return [$search, $all, $filtered];
     }
 
     protected function formatSearchParameter($keyword)
