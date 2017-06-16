@@ -2,19 +2,10 @@
 
 namespace Bhutanio\Laravel\Data;
 
-use Bhutanio\Laravel\Contracts\Data\RepositoryInterface;
-use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Pagination\LengthAwarePaginator;
-use Illuminate\Pagination\Paginator;
 
-/**
- * Class DbRepository.
- *
- * @method Model findOrFail($id) find record or fail
- * @method Model firstOrFail($column = 'id', $value) find record or fail
- */
-class DbRepository implements RepositoryInterface
+class DbRepository
 {
     /**
      * @var Model
@@ -22,265 +13,166 @@ class DbRepository implements RepositoryInterface
     protected $model;
 
     /**
-     * @var Model|\Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Query\Builder
-     */
-    protected $query;
-
-    /**
-     * @var array
-     */
-    protected $fields;
-
-    /**
-     * @var array
-     */
-    protected $relations;
-
-    /**
-     * @var array
-     */
-    protected $conditions = [];
-
-    /**
-     * @var bool|int
-     */
-    protected $cached = false;
-
-    /**
-     * @var string
-     */
-    protected $cache_id;
-
-    /**
-     * @var string
-     */
-    protected $cache_prefix = 'database:';
-
-    /**
-     * @var array
-     */
-    protected $param;
-
-    /**
-     * @var int
-     */
-    protected $per_page;
-
-    public function __construct()
-    {
-    }
-
-    /**
-     * Set model.
-     *
-     * @param Model $model
-     */
-    public function setModel(Model $model)
-    {
-        $this->model = $model;
-    }
-
-    /**
-     * Set the columns to be selected.
-     *
-     * @param array $fields
-     *
-     * @return self
-     */
-    public function select(array $fields = ['*'])
-    {
-        $this->fields = $fields;
-
-        return $this;
-    }
-
-    /**
-     * Set relations to the current query.
-     *
-     * @param array $relations
-     *
-     * @return self
-     */
-    public function with(array $relations)
-    {
-        $this->relations = $relations;
-
-        return $this;
-    }
-
-    /**
-     * Add a basic where clause to the query.
-     *
-     * @param string $column
-     * @param string $operator
-     * @param mixed $value
-     * @param string $boolean
-     *
-     * @return $this
-     */
-    public function where($column, $operator = null, $value = null, $boolean = 'and')
-    {
-        array_push($this->conditions, [
-            'column'   => $column,
-            'operator' => $operator,
-            'value'    => $value,
-            'boolean'  => $boolean,
-        ]);
-
-        return $this;
-    }
-
-    /**
-     * Cache database results, refer to putCache, getCache, getCacheId methods.
-     *
-     * @param $duration
-     *
-     * @return self
-     */
-    public function cache($duration)
-    {
-        $this->cached = $duration;
-
-        return $this;
-    }
-
-    /**
-     * Find record by its primary key.
-     *
-     * @param int $id
-     *
-     * @return Model
-     */
-    public function find($id)
-    {
-        $this->buildQuery();
-
-        return $this->query->find($id);
-    }
-
-    /**
-     * Get first record by column and value.
-     *
-     * @param string $column
-     * @param mixed $value
-     *
-     * @return Model
-     */
-    public function first($column, $value)
-    {
-        $this->buildQuery();
-
-        return $this->query->where($column, $value)->first();
-    }
-
-    /**
-     * Get records from the database.
-     *
-     * @param int $per_page
-     *
-     * @return Collection
-     */
-    public function get($per_page = 20)
-    {
-        $this->per_page = $per_page;
-        $this->buildQuery();
-
-        return $this->query->get();
-    }
-
-    /**
-     * Get current query builder.
-     *
-     * @return \Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Query\Builder
-     */
-    public function getQuery()
-    {
-        $this->buildQuery();
-
-        return $this->query;
-    }
-
-    /**
-     * Perform advanced search on the database.
-     *
      * @param array $param
-     * @param int $per_page
-     *
-     * @return array [param, title, results]
+     * @param int $limit
+     * @return DbSearchResult
      */
-    public function search(array $param, $per_page = 20)
+    public function search(array $param, $limit = 20)
     {
-        $this->per_page = $per_page;
+        array_multisort($param);
+
+        return new DbSearchResult($param, 'Search Results', $this->model->paginate($limit));
+    }
+
+    protected function filterCommonKeywords($keywords)
+    {
+        $stopwords = [
+            'a',
+            'about',
+            'an',
+            'are',
+            'as',
+            'at',
+            'be',
+            'by',
+            'com',
+            'de',
+            'en',
+            'for',
+            'from',
+            'how',
+            'i',
+            'in',
+            'is',
+            'it',
+            'la',
+            'of',
+            'on',
+            'or',
+            'that',
+            'the',
+            'this',
+            'to',
+            'was',
+            'what',
+            'when',
+            'where',
+            'who',
+            'will',
+            'with',
+            'und',
+            'the',
+            'www',
+        ];
+
+        $keywords = array_unique($keywords);
+        $keywords = array_filter($keywords, function ($keyword) use ($stopwords) {
+            $keyword = mb_strtolower($keyword);
+            $qkeyword = str_replace("'", '', $keyword);
+            if (in_array($qkeyword, $stopwords)) {
+                return null;
+            }
+            if (in_array($keyword, $stopwords)) {
+                return null;
+            }
+
+            return $keyword;
+        });
+        $keywords = array_filter($keywords);
+
+        return $keywords;
+    }
+
+    /**
+     * Perform a fulltext search
+     *
+     * @param Model|Builder $query
+     * @param string $column
+     * @param string $q Search Query
+     * @return mixed
+     */
+    protected function fulltextSearch($query, $column, $q)
+    {
+        list($search, $all, $filtered) = $this->fulltextClean($q);
+
+        if (starts_with($search, ['"', "'"]) && ends_with($search, ['"', "'"])) {
+            return $query->whereRaw("MATCH($column) AGAINST(? IN BOOLEAN MODE)")->setBindings(["\"$keyword*\""]);
+        }
+
+        return $query
+            ->whereRaw("MATCH($column) AGAINST(? IN BOOLEAN MODE)")->setBindings(["\"$keyword\""])
+            ->orWhere(function ($q) use ($all, $filtered, $column) {
+                $bindings = [];
+                $keywords = $filtered;
+                if (count($filtered) < 1) {
+                    $keywords = $all;
+                }
+                foreach ($keywords as $keyword) {
+                    $q->whereRaw("MATCH($column) AGAINST(? IN BOOLEAN MODE)");
+                    $bindings[] = $keyword . '*';
+                }
+                $q->setBindings($bindings);
+            });
+    }
+
+    /**
+     * cleanup and breakdown search string into keywords
+     *
+     * @param string $string
+     * @return array
+     */
+    protected function fulltextClean($string)
+    {
+        $search = preg_replace('/\*|\"/', '', $string);
+        $search = preg_replace(['/[^\p{L}\p{N}_]+/u', '/[+\-><\(\)~*\"@]+/'], ' ', $search);
+        $search = trim($search);
+
+        $all = preg_split('/(\s|\-|\.)/', $search);
+        $all = array_filter($all);
+
+        $filtered = $this->filterCommonKeywords($all);
 
         return [
-            'params'  => $param,
-            'title'   => '',
-            'results' => [],
+            'search'   => $search,
+            'all'      => $all,
+            'filtered' => $filtered,
         ];
     }
 
-    /**
-     * Paginate current results.
-     *
-     * @param int $per_page
-     *
-     * @return LengthAwarePaginator
-     */
-    public function paginate($per_page = 20)
+    protected function formatSearchParameter($keyword)
     {
-        $this->per_page = $per_page;
-        $this->buildQuery();
+        if (mb_strlen($keyword) < 3) {
+            return $keyword . '%';
+        }
 
-        return $this->query->paginate($per_page);
+        return '%' . $keyword . '%';
     }
 
     /**
-     * Custom Paginate current results, for queries that cannot be paginated using paginate().
+     * Multi Search on child tables
      *
-     * @param int $total
-     * @param int $per_page
-     *
-     * @return LengthAwarePaginator
+     * @param Model|Builder $query
+     * @param array $child_ids
+     * @param string $parent
+     * @param string $parent_id
+     * @param string $child
+     * @param string $child_id
+     * @return Builder
      */
-    public function customPaginate($total, $per_page = 20)
+    protected function searchChildren($query, $child_ids, $parent, $parent_id, $child, $child_id)
     {
-        $this->per_page = $per_page;
-        $this->buildQuery();
-        $current_page = Paginator::resolveCurrentPage() ? Paginator::resolveCurrentPage() : 1;
-        $data = $this->query->paginate($per_page)->items();
-        $pagination = new LengthAwarePaginator($data, $total, $per_page, $current_page, [
-            'path' => Paginator::resolveCurrentPath(),
-        ]);
+        $child_ids = (array)$child_ids;
+        $child_ids = array_unique($child_ids);
 
-        return $pagination;
-    }
+        if (!empty($child_ids)) {
+            foreach ($child_ids as $key => $value) {
+                $child_table = $child . '_' . $key;
 
-    public function __call($method, $parameters)
-    {
-        $this->buildQuery();
-
-        return call_user_func_array([$this->query, $method], $parameters);
-    }
-
-    private function buildQuery()
-    {
-        $this->query = app(get_class($this->model));
-
-        if (!empty($this->fields)) {
-            $this->query = $this->query->select($this->fields);
-        }
-        if (!empty($this->relations)) {
-            $this->relations = array_unique($this->relations);
-            $this->query = $this->query->with($this->relations);
-        }
-        if (!empty($this->per_page)) {
-            $this->query = $this->query->take($this->per_page);
-        }
-        if (count($this->conditions)) {
-            foreach ($this->conditions as $condition) {
-                $this->query = $this->query->where($condition['column'], $condition['operator'], $condition['value'],
-                    $condition['boolean']);
+                $query = $query->join($child . ' as ' . $child_table, $parent . '.id', '=',
+                    $child_table . '.' . $parent_id)->where($child_table . '.' . $child_id, $value);
             }
         }
+
+        return $query;
     }
 }

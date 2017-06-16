@@ -139,3 +139,156 @@ function form_error($errors, $field)
 
     return '';
 }
+
+if (!function_exists('form_select')) {
+    /**
+     * Returns an array to be used in Laravel's form builder.
+     *
+     * @param $data
+     * @param $name
+     * @param string $id
+     * @return array
+     */
+    function form_select($data, $name, $id = 'id')
+    {
+        $new_data = [];
+        foreach ($data as $key => $value) {
+            if (is_array($value)) {
+                $new_data[$value[$id]] = $value[$name];
+            } elseif (is_object($value)) {
+                $new_data[$value->$id] = $value->$name;
+            }
+        }
+
+        return $new_data;
+    }
+}
+
+if (!function_exists('form_select_json')) {
+    /**
+     * Returns JSON of $data to be used in JavaScript tools like jQuery Plugins.
+     *
+     * @param        $data
+     * @param        $name
+     * @param string $id
+     * @param bool $sort
+     *
+     * @return string
+     */
+    function form_select_json($data, $name, $id = 'id', $sort = true)
+    {
+        $selects = form_select($data, $id, $name, $sort);
+        $result = [];
+        foreach ($selects as $key => $value) {
+            $result[] = [
+                'id'   => $key,
+                'text' => $value,
+            ];
+        }
+
+        return json_encode($result);
+    }
+}
+
+if (!function_exists('form_select_csv')) {
+    /**
+     * Returns a CSV string from $data (can be a Laravel Collection).
+     *
+     * @param      $datas
+     * @param bool $column
+     *
+     * @return string
+     */
+    function form_select_csv($datas, $column = false)
+    {
+        $output = '';
+
+        foreach ($datas as $data) {
+            if ($column) {
+                if (is_array($data)) {
+                    $output .= $data[$column] . ',';
+                } elseif (is_object($data)) {
+                    $output .= $data->$column . ',';
+                }
+            } else {
+                $output .= $data . ',';
+            }
+        }
+
+        $output = rtrim($output, ',');
+
+        return $output;
+    }
+}
+
+
+if (!function_exists('order_sort')) {
+    /**
+     * @param        $name
+     * @param        $order_column
+     * @param        $order_by
+     * @param string $default
+     *
+     * @return string
+     */
+    function order_sort($name, $order_column, $order_by, $default = 'desc')
+    {
+        if ($name == $order_column) {
+            return ($order_by == 'desc') ? 'asc' : 'desc';
+        }
+
+        return $default;
+    }
+}
+
+if (!function_exists('order_sort_icon')) {
+    /**
+     * Sort icon
+     *
+     * @param $name
+     * @param $order_column
+     * @param $order_by
+     * @return string
+     */
+    function order_sort_icon($name, $order_column, $order_by)
+    {
+        if ($name == $order_column && $order_by == 'desc') {
+            return '<i class="fa fa-fw fa-sort-desc"></i>';
+        } elseif ($name == $order_column) {
+            return '<i class="fa fa-fw fa-sort-asc"></i>';
+        }
+
+        return '<i class="fa fa-fw fa-sort"></i>';
+    }
+}
+
+if (!function_exists('order_sort_row')) {
+    /**
+     * Sort Link
+     *
+     * @param $action_url
+     * @param $order_appends
+     * @param $order
+     * @param $sort
+     * @param $column
+     * @param null $title
+     * @param string $default_sort
+     * @param null $display
+     * @return string
+     */
+    function order_sort_row(
+        $action_url,
+        $order_appends,
+        $order,
+        $sort,
+        $column,
+        $title = null,
+        $default_sort = 'desc',
+        $display = null
+    ) {
+        return '<a href="' . action($action_url,
+                $order_appends + ['order' => $column, 'sort' => order_sort($column, $order, $sort, $default_sort)])
+            . '" class="sort" data-toggle="tooltip" title="Order by ' . ($title ? $title : title_case($column)) . '">' . ($display ? $display : ($title ? $title : title_case($column))) . order_sort_icon($column,
+                $order, $sort) . "</a>";
+    }
+}

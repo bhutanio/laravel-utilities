@@ -2,15 +2,15 @@
 
 namespace Bhutanio\Laravel\Data;
 
-use Bhutanio\Laravel\Contracts\Data\DataServiceInterface;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
-class DataService implements DataServiceInterface
+class DataService
 {
     /**
      * @var Model
      */
-    public $model;
+    protected $model;
 
     /**
      * Set model.
@@ -49,40 +49,10 @@ class DataService implements DataServiceInterface
     }
 
     /**
-     * Update data.
+     * Get fillable table columns for the model
      *
-     * @param int $id primary key
+     * @param Model $model
      * @param array $data
-     *
-     * @return Model|bool
-     */
-    public function update($id, array $data)
-    {
-        $data = $this->format($data);
-        $model = $this->model->findOrFail($id);
-
-        if ($model->update($data)) {
-            return $model;
-        }
-
-        return false;
-    }
-
-    /**
-     * Delete Data.
-     *
-     * @param int $id primary key
-     *
-     * @return bool
-     */
-    public function delete($id)
-    {
-        return $this->model->where('id', $id)->delete();
-    }
-
-    /**
-     * @param $model
-     * @param $data
      *
      * @return array
      */
@@ -96,5 +66,36 @@ class DataService implements DataServiceInterface
         }
 
         return $fill_data;
+    }
+
+    /**
+     * Update data.
+     *
+     * @param int $id primary key
+     * @param array $data
+     *
+     * @return Model|bool
+     * @throws ModelNotFoundException
+     */
+    public function update($id, array $data)
+    {
+        $data = $this->format($data);
+        $model = $this->model->findOrFail($id);
+
+        $model->update($data);
+
+        return $model;
+    }
+
+    /**
+     * Delete Data.
+     *
+     * @param int $id primary key
+     *
+     * @return bool
+     */
+    public function delete($id)
+    {
+        return $this->model->where('id', $id)->delete();
     }
 }
