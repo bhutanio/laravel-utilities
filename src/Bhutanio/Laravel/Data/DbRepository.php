@@ -99,7 +99,7 @@ class DbRepository
             return $query->where($column, 'like', $this->formatSearchParameter($search));
         }
 
-        if (starts_with($search, ['"', "'"]) && ends_with($search, ['"', "'"])) {
+        if (starts_with($q, ['"', "'"]) && ends_with($q, ['"', "'"])) {
             return $query->whereRaw("MATCH($column) AGAINST(? IN BOOLEAN MODE)")->setBindings(["\"$search*\""]);
         }
 
