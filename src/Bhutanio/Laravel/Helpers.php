@@ -1,143 +1,176 @@
 <?php
 
-// Laravel Aliases
-/**
- * @return \Bhutanio\Laravel\Services\MetaDataService
- */
-function meta()
-{
-    return app(Bhutanio\Laravel\Services\MetaDataService::class);
+if (!function_exists('meta')) {
+    /**
+     * @return \Bhutanio\Laravel\Services\MetaDataService
+     */
+    function meta()
+    {
+        return app(Bhutanio\Laravel\Services\MetaDataService::class);
+    }
 }
 
-/**
- * @param $config array
- *
- * @return \Bhutanio\Laravel\Services\Guzzler
- */
-function guzzler($config = [])
-{
-    return app(Bhutanio\Laravel\Services\Guzzler::class, $config);
+if (!function_exists('guzzler')) {
+    /**
+     * @param $config array
+     *
+     * @return \Bhutanio\Laravel\Services\Guzzler
+     */
+    function guzzler($config = [])
+    {
+        return app(Bhutanio\Laravel\Services\Guzzler::class, $config);
+    }
 }
 
-/**
- * @param null $time
- * @param null $tz
- *
- * @return \Carbon\Carbon
- */
-function carbon($time = null, $tz = null)
-{
-    return new \Carbon\Carbon($time, $tz);
+if (!function_exists('carbon')) {
+    /**
+     * @param null $time
+     * @param null $tz
+     *
+     * @return \Carbon\Carbon
+     */
+    function carbon($time = null, $tz = null)
+    {
+        return new \Carbon\Carbon($time, $tz);
+    }
 }
 
-/**
- * Generate directory path for saving files.
- *
- * @param $text
- *
- * @return string
- */
-function leveled_dir($text)
-{
-    $dirs = str_split($text, 1);
-    if (count($dirs) > 2) {
+if (!function_exists('leveled_dir')) {
+    /**
+     * Generate directory path for saving files.
+     *
+     * @param $text
+     *
+     * @return string
+     */
+    function leveled_dir($text)
+    {
+        if (strlen($text) > 2) {
+            $dirs = str_split($text, 1);
+        } else {
+            $dirs = str_split(md5($text), 1);
+        }
+
         return $dirs[0] . DIRECTORY_SEPARATOR . $dirs[1] . DIRECTORY_SEPARATOR . $dirs[2];
     }
-
-    return '0' . DIRECTORY_SEPARATOR . '0' . DIRECTORY_SEPARATOR . '0';
 }
 
-/**
- * Get IP Address, checks for cloudflare headers.
- *
- * @return string
- */
-function get_ip()
-{
-    if (getenv('HTTP_CF_CONNECTING_IP') && is_valid_ip(getenv('HTTP_CF_CONNECTING_IP'))) {
-        return getenv('HTTP_CF_CONNECTING_IP');
-    }
+/********************************************************************************************
+ * IP Helpers
+ ********************************************************************************************/
 
-    return request()->getClientIp();
+if (!function_exists('get_ip')) {
+    /**
+     * Get IP Address, checks for cloudflare headers.
+     *
+     * @return string
+     */
+    function get_ip()
+    {
+        if (getenv('HTTP_CF_CONNECTING_IP') && is_valid_ip(getenv('HTTP_CF_CONNECTING_IP'))) {
+            return getenv('HTTP_CF_CONNECTING_IP');
+        }
+
+        return request()->getClientIp();
+    }
 }
 
-/**
- * Validate IP Address.
- *
- * @param string $ip IP address
- * @param string $which IP protocol: 'ipv4' or 'ipv6'
- *
- * @return bool
- */
-function is_valid_ip($ip, $which = 'ipv4')
-{
-    if ($ip == '0.0.0.0' || $ip == '127.0.0.1') {
-        return false;
-    }
-    switch (strtolower($which)) {
-        case 'ipv4':
-            $which = FILTER_FLAG_IPV4;
-            break;
-        case 'ipv6':
-            $which = FILTER_FLAG_IPV6;
-            break;
-        default:
-            $which = null;
-            break;
-    }
 
-    return (bool)filter_var($ip, FILTER_VALIDATE_IP, $which);
+if (!function_exists('is_valid_ip')) {
+    /**
+     * Check if IP Address is a valid IP.
+     *
+     * @param string $ip IP address
+     * @param string $which IP protocol: 'ipv4' or 'ipv6'
+     *
+     * @return bool
+     */
+    function is_valid_ip($ip, $which = 'ipv4')
+    {
+        if ($ip == '0.0.0.0' || $ip == '127.0.0.1') {
+            return false;
+        }
+        switch (strtolower($which)) {
+            case 'ipv4':
+                $which = FILTER_FLAG_IPV4;
+                break;
+            case 'ipv6':
+                $which = FILTER_FLAG_IPV6;
+                break;
+            default:
+                $which = null;
+                break;
+        }
+
+        return (bool)filter_var($ip, FILTER_VALIDATE_IP, $which);
+    }
 }
 
-function is_valid_ipv6($ip)
-{
-    return is_valid_ip($ip, 'ipv6');
+if (!function_exists('is_valid_ipv6')) {
+    /**
+     * Check if ip is a valid ipv6
+     *
+     * @param $ip
+     * @return bool
+     */
+    function is_valid_ipv6($ip)
+    {
+        return is_valid_ip($ip, 'ipv6');
+    }
 }
 
-/**
- * Validate IPv4 Address (Check if it is a public IP).
- *
- * @param string $ip IP address
- *
- * @return bool
- */
-function is_public_ip($ip)
-{
-    if (!is_valid_ip($ip)) {
-        return false;
-    }
+if (!function_exists('is_public_ip')) {
+    /**
+     * Validate IPv4 Address (Check if it is a public IP).
+     *
+     * @param string $ip IP address
+     *
+     * @return bool
+     */
+    function is_public_ip($ip)
+    {
+        if (!is_valid_ip($ip)) {
+            return false;
+        }
 
-    return (bool)filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE);
+        return (bool)filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE);
+    }
 }
 
-// View Helpers
+/********************************************************************************************
+ * View Helpers
+ ********************************************************************************************/
 
-/**
- * @param $errors \Illuminate\Support\ViewErrorBag
- * @param $field string
- * @return string
- */
-function form_error_class($errors, $field)
-{
-    if ($errors->has($field)) {
-        return ' has-error';
+if (!function_exists('form_error')) {
+    /**
+     * @param $errors \Illuminate\Support\ViewErrorBag
+     * @param $field string
+     * @return string
+     */
+    function form_error($errors, $field)
+    {
+        if ($errors->has($field)) {
+            return '<span class="help-block"><strong>' . $errors->first($field) . '</strong></span>';
+        }
+
+        return '';
     }
-
-    return '';
 }
 
-/**
- * @param $errors \Illuminate\Support\ViewErrorBag
- * @param $field string
- * @return string
- */
-function form_error($errors, $field)
-{
-    if ($errors->has($field)) {
-        return '<span class="help-block"><strong>' . $errors->first($field) . '</strong></span>';
-    }
+if (!function_exists('form_error_class')) {
+    /**
+     * @param $errors \Illuminate\Support\ViewErrorBag
+     * @param $field string
+     * @return string
+     */
+    function form_error_class($errors, $field)
+    {
+        if ($errors->has($field)) {
+            return ' has-error';
+        }
 
-    return '';
+        return '';
+    }
 }
 
 if (!function_exists('form_select')) {
