@@ -2,43 +2,24 @@
 
 namespace Bhutanio\Laravel\Services;
 
-use Bhutanio\Laravel\Contracts\Services\SMSMessengerInterface;
+use Nexmo\Client as Nexmo;
+use Nexmo\Client\Credentials\Basic;
 
-class SMSMessenger implements SMSMessengerInterface
+class SMSMessenger
 {
-    protected $api_url;
-    protected $api_user;
-    protected $api_password;
+    private $nexmo;
 
-    protected $sms_to;
-    protected $sms_message;
-
-    /**
-     * SMSMessenger constructor.
-     */
-    public function __construct()
+    public function __construct($api_key, $api_secret)
     {
-        $this->api_url = '';
-        $this->api_user = '';
-        $this->api_password = '';
+        $this->nexmo = new Nexmo(new Basic($api_key, $api_secret));
     }
 
-    /**
-     * Configure the email to be sent.
-     *
-     * @param string $to
-     * @param $message $data
-     */
-    public function configure($to, $message)
+    public function send($from, $to, $message)
     {
-        $this->sms_to = $to;
-        $this->sms_message = $message;
-    }
-
-    /**
-     * Send or queue the current email.
-     */
-    public function send()
-    {
+        return $this->nexmo->message()->send([
+            'to'   => $to,
+            'from' => $from,
+            'text' => $message,
+        ]);
     }
 }
