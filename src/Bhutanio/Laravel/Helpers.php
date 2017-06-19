@@ -35,6 +35,24 @@ if (!function_exists('carbon')) {
     }
 }
 
+if (!function_exists('flash')) {
+    function flash($message, $type = 'info')
+    {
+        if ($type == 'error') {
+            $type = 'danger';
+        }
+
+        if (!in_array($type, ['success', 'info', 'warning', 'danger'])) {
+            $type = 'info';
+        }
+
+        app('session')->flash('flash_message', [
+            'type'    => $type,
+            'message' => $message,
+        ]);
+    }
+}
+
 if (!function_exists('leveled_dir')) {
     /**
      * Generate directory path for saving files.
