@@ -61,7 +61,7 @@ class DataService
         $fill_data = [];
         foreach ($model->getFillable() as $fill) {
             if (array_key_exists($fill, $data)) {
-                $fill_data[$fill] = !empty($data[$fill]) ? $data[$fill] : null;
+                $fill_data[$fill] = $data[$fill];
             }
         }
 
