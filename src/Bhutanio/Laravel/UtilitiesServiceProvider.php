@@ -4,6 +4,7 @@ namespace Bhutanio\Laravel;
 
 use Bhutanio\Laravel\Services\Guzzler;
 use Bhutanio\Laravel\Services\MetaDataService;
+use Bhutanio\Laravel\Services\UserDataService;
 use Illuminate\Support\ServiceProvider;
 
 class UtilitiesServiceProvider extends ServiceProvider
@@ -20,6 +21,9 @@ class UtilitiesServiceProvider extends ServiceProvider
 
         // MetaDataService - Meta title, description and theme manager
         $this->app->singleton(MetaDataService::class);
+
+        //UserDataService - User Data
+        $this->app->singleton(UserDataService::class);
     }
 
     /**
