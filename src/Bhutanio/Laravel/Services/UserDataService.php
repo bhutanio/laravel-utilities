@@ -4,13 +4,18 @@ namespace Bhutanio\Laravel\Services;
 
 use Illuminate\Support\Facades\Auth;
 
-class UserDataService
+abstract class UserDataService
 {
     protected $user;
 
     public function __construct()
     {
-        $this->user = Auth::user();
+        $this->user = $this->loadUser();
+    }
+
+    public function user()
+    {
+        return $this->user;
     }
 
     public function is($group)
@@ -21,5 +26,10 @@ class UserDataService
     public function can()
     {
 
+    }
+
+    protected function loadUser()
+    {
+        return Auth::user();
     }
 }

@@ -21,9 +21,6 @@ class UtilitiesServiceProvider extends ServiceProvider
 
         // MetaDataService - Meta title, description and theme manager
         $this->app->singleton(MetaDataService::class);
-
-        //UserDataService - User Data
-        $this->app->singleton(UserDataService::class);
     }
 
     /**

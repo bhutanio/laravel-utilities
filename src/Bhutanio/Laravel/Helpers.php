@@ -1,15 +1,5 @@
 <?php
 
-if (!function_exists('user')) {
-    /**
-     * @return \Bhutanio\Laravel\Services\UserDataService
-     */
-    function user()
-    {
-        return app(\Bhutanio\Laravel\Services\UserDataService::class);
-    }
-}
-
 if (!function_exists('meta')) {
     /**
      * @return \Bhutanio\Laravel\Services\MetaDataService
