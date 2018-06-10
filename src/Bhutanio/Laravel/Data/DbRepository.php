@@ -86,7 +86,7 @@ class DbRepository
     /**
      * Perform a fulltext search
      *
-     * @param Model|Builder $query
+     * @param Builder $query
      * @param string $column
      * @param string $q Search Query
      * @return mixed
@@ -153,7 +153,7 @@ class DbRepository
     /**
      * Multi Search on child tables
      *
-     * @param Model|Builder $query
+     * @param Builder $query
      * @param array $child_ids
      * @param string $foreign_key
      * @param string $child
@@ -165,7 +165,7 @@ class DbRepository
         $child_ids = (array)$child_ids;
         $child_ids = array_unique($child_ids);
 
-        $parent = $query->getTable();
+        $parent = $query->getModel()->getTable();
 
         if (!empty($child_ids)) {
             foreach ($child_ids as $key => $value) {
