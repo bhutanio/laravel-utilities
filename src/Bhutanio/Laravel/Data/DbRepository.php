@@ -104,18 +104,20 @@ class DbRepository
         }
 
         return $query
-            ->whereRaw("MATCH($column) AGAINST(? IN BOOLEAN MODE)")->setBindings(["\"$search\""])
-            ->orWhere(function ($q) use ($all, $filtered, $column) {
-                $bindings = [];
-                $keywords = $filtered;
-                if (count($filtered) < 1) {
-                    $keywords = $all;
-                }
-                foreach ($keywords as $keyword) {
-                    $q->whereRaw("MATCH($column) AGAINST(? IN BOOLEAN MODE)");
-                    $bindings[] = $keyword . '*';
-                }
-                $q->setBindings($bindings);
+            ->where(function ($q) use ($column, $search, $all, $filtered) {
+                $q->whereRaw("MATCH($column) AGAINST(? IN BOOLEAN MODE)")->setBindings(["\"$search\""])
+                    ->orWhere(function ($q) use ($all, $filtered, $column) {
+                        $bindings = [];
+                        $keywords = $filtered;
+                        if (count($filtered) < 1) {
+                            $keywords = $all;
+                        }
+                        foreach ($keywords as $keyword) {
+                            $q->whereRaw("MATCH($column) AGAINST(? IN BOOLEAN MODE)");
+                            $bindings[] = $keyword . '*';
+                        }
+                        $q->setBindings($bindings);
+                    });
             });
     }
 
